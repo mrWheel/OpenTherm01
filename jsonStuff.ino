@@ -16,7 +16,7 @@ void sendStartJsonObj(const char *objName)
   char sBuff[50] = "";
   objSprtr[0]    = '\0';
 
-  snprintf(sBuff, sizeof(sBuff), "{\"%s\":[\r\n", objName);
+  snprintf(sBuff, sizeof(sBuff), "{\"%s\": {\r\n", objName);
   httpServer.sendHeader("Access-Control-Allow-Origin", "*");
   httpServer.setContentLength(CONTENT_LENGTH_UNKNOWN);
   httpServer.send(200, "application/json", sBuff);
@@ -27,7 +27,7 @@ void sendStartJsonObj(const char *objName)
 //=======================================================================
 void sendEndJsonObj()
 {
-  httpServer.sendContent("\r\n]}\r\n");
+  httpServer.sendContent("\r\n}}\r\n");
 
   //httpServer.sendHeader( "Content-Length", "0");
   //httpServer.send ( 200, "application/json", "");
@@ -94,7 +94,28 @@ void sendNestedJsonObj(const char *cName, uint32_t uValue)
 
 } // sendNestedJsonObj(*char, uint)
 
+void sendJsonObj(const char *cName, float fValue)
+{
+  char jsonBuff[200] = "";
+  
+  snprintf(jsonBuff, sizeof(jsonBuff), "%s\t\"%s\" :  %.1f",
+                                      objSprtr, cName, fValue);
 
+  httpServer.sendContent(jsonBuff);
+  sprintf(objSprtr, ",\r\n");
+
+} 
+void sendJsonObj(const char *cName, int iValue)
+{
+  char jsonBuff[200] = "";
+  
+  snprintf(jsonBuff, sizeof(jsonBuff), "%s\t\"%s\" :  %d",
+                                      objSprtr, cName, iValue);
+
+  httpServer.sendContent(jsonBuff);
+  sprintf(objSprtr, ",\r\n");
+
+} 
 //=======================================================================
 void sendNestedJsonObj(const char *cName, float fValue)
 {

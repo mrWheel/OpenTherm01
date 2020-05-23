@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<head>
+    <meta charset=utf-8>
+    <meta http-equiv=X-UA-Compatible content="IE=edge">
+    <meta name=viewport content="width=device-width,initial-scale=1">
+    <link rel=icon href=/favicon.ico> <title>OpenTherm GW</title>
+    <link href="https://fonts.googleapis.com/css?family=Dosis:400,700" rel="stylesheet">
+    <link href="OTindex.css" rel="stylesheet">
+    <script src="OTindex.js"></script>
+</head>
+  
+<body><noscript><strong>Please enable JavaScript to continue.</strong></noscript>
+    <div class=outer>
+        <div class=card id=dhw>
+            <h1 id=DHWh>DHW</h1>
+            <h2 id=Tdhw>0.0</h2>
+            <h2 id=TdhwSet>0.0</h2>
+        </div>
+        <div class=card id=boiler>
+            <h1 id=boiler>Boiler</h1>
+
+            <h2 id=Tboiler>0.0</h2>
+            <h2 id=Tret>0.0</h2>
+
+            <h2 id=mudulation_level>0.0</h2>
+        </div>
+        <div class=card id=ch>
+            <h1 id=ch>CH</h1>
+            <h2 id=Tset>0.0</h2>
+
+            <h2 id=ch_pres>0.0</h2>
+            <h2 id=TrSet>0.0</h2>
+            <h2 id=Tr>0.0</h2>
+
+        </div>
+    </div>    
+    <script>
+        update() // fill fist-time data
+        var timer = setInterval(update, 15 * 1000) // update every 15 seconds
+    </script>
+</body> 
+</html>

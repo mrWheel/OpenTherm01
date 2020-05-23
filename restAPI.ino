@@ -76,6 +76,11 @@ void processAPI()
     {
       sendDeviceSettings();
     }
+  } 
+  // hjm OpenTherm01
+  else if (words[3] == "status")
+  {
+      sendStatus();
   }
   else sendApiNotFound(URI);
   
@@ -109,8 +114,8 @@ void sendDeviceInfo()
   sendNestedJsonObj("flashchipsize", formatFloat((ESP.getFlashChipSize() / 1024.0 / 1024.0), 3));
   sendNestedJsonObj("flashchiprealsize", formatFloat((ESP.getFlashChipRealSize() / 1024.0 / 1024.0), 3));
 
-  SPIFFS.info(SPIFFSinfo);
-  sendNestedJsonObj("spiffssize", formatFloat( (SPIFFSinfo.totalBytes / (1024.0 * 1024.0)), 0));
+  LittleFS.info(LittleFSinfo);
+  sendNestedJsonObj("LittleFSsize", formatFloat( (LittleFSinfo.totalBytes / (1024.0 * 1024.0)), 0));
 
   sendNestedJsonObj("flashchipspeed", formatFloat((ESP.getFlashChipSpeed() / 1000.0 / 1000.0), 0));
 
@@ -119,15 +124,20 @@ void sendDeviceInfo()
   sendNestedJsonObj("boardtype",
 #ifdef ARDUINO_ESP8266_NODEMCU
      "ESP8266_NODEMCU"
-#endif
+#else
 #ifdef ARDUINO_ESP8266_GENERIC
      "ESP8266_GENERIC"
-#endif
+#else
 #ifdef ESP8266_ESP01
      "ESP8266_ESP01"
-#endif
+#else
 #ifdef ESP8266_ESP12
      "ESP8266_ESP12"
+#else 
+      "other"
+#endif
+#endif
+#endif
 #endif
   );
   sendNestedJsonObj("ssid", WiFi.SSID().c_str());

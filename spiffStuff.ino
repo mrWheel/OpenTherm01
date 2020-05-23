@@ -1,5 +1,5 @@
 /*
- *  spiffStuff 
+ *  LittleFStuff 
  */
 
 //------------------------------------------------------------------------
@@ -9,13 +9,13 @@ bool readFileById(const char* fName, uint8_t mId)
 
   DebugTf("read [%s] ", fName);
   
-  if (!SPIFFS.exists(fName)) 
+  if (!LittleFS.exists(fName)) 
   {
     Debugln("Does not exist!");
     return false;
   }
 
-  File f = SPIFFS.open(fName, "r");
+  File f = LittleFS.open(fName, "r");
 
   while(f.available()) 
   {
@@ -37,7 +37,7 @@ bool writeFileById(const char* fName, uint8_t mId, const char *data)
 
   DebugTf("write [%s] ", fName);
 
-  File file = SPIFFS.open(fName, "w");
+  File file = LittleFS.open(fName, "w");
   if (!file) 
   {
     Debugf("open(%s, 'w') FAILED!!! --> Bailout\r\n", fName);

@@ -1,12 +1,13 @@
-
 #define _FW_VERSION "v1.0.0 (19-05-2020)"
 
+#include <FS.h>
+#include <LittleFS.h>
 
 #define _HOSTNAME   "OpenTherm01"
 #include "OpenTherm01.h"
 
 #include <opentherm.h>
-
+#include "timing.h"
 // Wemos D1 on 1of!-Wemos board
 #define THERMOSTAT_IN   16
 #define THERMOSTAT_OUT   4
@@ -23,8 +24,6 @@ int mode = 0;
 // WiFi Server object and parameters
 WiFiServer server(80);
 
-
-
 //=====================================================================
 void setup()
 {
@@ -38,15 +37,15 @@ void setup()
   DebugTln("\r\n[OpenTherm01]\r\n");
   DebugTf("Booting....[%s]\r\n\r\n", String(_FW_VERSION).c_str());
   
-//================ SPIFFS ===========================================
-  if (SPIFFS.begin()) 
+//================ LittleFS ===========================================
+  if (LittleFS.begin()) 
   {
-    DebugTln(F("SPIFFS Mount succesfull\r"));
-    SPIFFSmounted = true;
+    DebugTln(F("LittleFS Mount succesfull\r"));
+    LittleFSmounted = true;
   } else { 
-    DebugTln(F("SPIFFS Mount failed\r"));   // Serious problem with SPIFFS 
-    SPIFFSmounted = false;
-  }
+    DebugTln(F("LittleFS Mount failed\r"));   // Serious problem with LittleFS 
+    LittleFSmounted = false;
+}
 
   readSettings(true);
 
@@ -81,12 +80,12 @@ void setup()
 
 //================ Start HTTP Server ================================
   setupFSexplorer();
-  httpServer.serveStatic("/FSexplorer.png",   SPIFFS, "/FSexplorer.png");
+  httpServer.serveStatic("/FSexplorer.png",   LittleFS, "/FSexplorer.png");
   httpServer.on("/",          sendIndexPage);
   httpServer.on("/index",     sendIndexPage);
   httpServer.on("/index.html",sendIndexPage);
-  httpServer.serveStatic("/index.css", SPIFFS, "/index.css");
-  httpServer.serveStatic("/index.js",  SPIFFS, "/index.js");
+  httpServer.serveStatic("/index.css", LittleFS, "/index.css");
+  httpServer.serveStatic("/index.js",  LittleFS, "/index.js");
   // all other api calls are catched in FSexplorer onNotFounD!
   httpServer.on("/api", HTTP_GET, processAPI);
 
@@ -123,39 +122,15 @@ void setup()
 void loop()
 {
   handleNTP();
+
+  
   httpServer.handleClient();
   MDNS.update();
 
   /*** vanaf hier mag je het helemaal zelf bedenken ;-) ***/
   
-  if (mode == MODE_LISTEN_MASTER) {
-    if (OPENTHERM::isSent() || OPENTHERM::isIdle() || OPENTHERM::isError()) {
-      OPENTHERM::listen(THERMOSTAT_IN);
-    }
-    else if (OPENTHERM::getMessage(message)) {
-      Debug("-> ");
-      OPENTHERM::printToSerial(message);
-      Debugln();
-      OPENTHERM::send(BOILER_OUT, message); // forward message to boiler
-      mode = MODE_LISTEN_SLAVE;
-    }
-  }
-  else if (mode == MODE_LISTEN_SLAVE) {
-    if (OPENTHERM::isSent()) {
-      OPENTHERM::listen(BOILER_IN, 800); // response need to be send back by boiler within 800ms
-    }
-    else if (OPENTHERM::getMessage(message)) {
-      Debug("<- ");
-      OPENTHERM::printToSerial(message);
-      Debugln();
-      Debugln();
-      OPENTHERM::send(THERMOSTAT_OUT, message); // send message back to thermostat
-      mode = MODE_LISTEN_MASTER;
-    }
-    else if (OPENTHERM::isError()) {
-      mode = MODE_LISTEN_MASTER;
-      Debugln("<- Timeout");
-      Debugln();
-    }
-  }
+  myOpenthermLoop();
+
 } // loop()
+
+
