@@ -19,23 +19,24 @@ function update()
             
         }
 
-        if(json["otinfo"]["status"] != 0)
-        {
-            if ( json["otinfo"]["status"] & 2 )
-                document.getElementById("CH").style.background="red"
-            else
-                document.getElementById("CH").style.background="#314b77"
+        
+        let stat = parseInt(json["otinfo"]["status"]);
 
-            if ( json["otinfo"]["status"] & 4 )
-                document.getElementById("DHW").style.background="red"
-            else
-                document.getElementById("DHW").style.background="#314b77"
+        if ( stat & 2 )
+            document.getElementById("CH_h").style.background="red"
+        else
+            document.getElementById("CH_h").style.background="#314b77"
 
-            if ( json["otinfo"]["status"] & 8 )
-                document.getElementById("Boiler").style.background="red"
-            else
-                document.getElementById("Boiler").style.background="#314b77"
-        } 
+        if ( stat & 4 )
+            document.getElementById("DHW_h").style.background="red"
+        else
+            document.getElementById("DHW_h").style.background="#314b77"
+
+        if ( stat & 8 )
+            document.getElementById("boiler_h").style.background="red"
+        else
+            document.getElementById("boiler_h").style.background="#314b77"
+    
     })
     .catch(function(error) {
         console.log("Error catched")

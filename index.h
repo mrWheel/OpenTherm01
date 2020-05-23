@@ -100,23 +100,24 @@ function update()
             
         }
 
-        if(json["otinfo"]["status"] != 0)
-        {
-            if ( json["otinfo"]["status"] & 2 )
-                document.getElementById("CH").style.background="red"
-            else
-                document.getElementById("CH").style.background="#314b77"
+        
+        let stat = parseInt(json["otinfo"]["status"]);
 
-            if ( json["otinfo"]["status"] & 4 )
-                document.getElementById("DHW").style.background="red"
-            else
-                document.getElementById("DHW").style.background="#314b77"
+        if ( stat & 2 )
+            document.getElementById("CH_h").style.background="red"
+        else
+            document.getElementById("CH_h").style.background="#314b77"
 
-            if ( json["otinfo"]["status"] & 8 )
-                document.getElementById("Boiler").style.background="red"
-            else
-                document.getElementById("Boiler").style.background="#314b77"
-        } 
+        if ( stat & 4 )
+            document.getElementById("DHW_h").style.background="red"
+        else
+            document.getElementById("DHW_h").style.background="#314b77"
+
+        if ( stat & 8 )
+            document.getElementById("boiler_h").style.background="red"
+        else
+            document.getElementById("boiler_h").style.background="#314b77"
+    
     })
     .catch(function(error) {
         console.log("Error catched")
@@ -133,20 +134,22 @@ function update()
 <body><noscript><strong>Please enable JavaScript to continue.</strong></noscript>
 <div class=outer>
 <div class=card id=dhw>
-<h1 id=DHWh>DHW</h1>
+<h1 id=DHW_h>DHW</h1>
 <h2 id=Tdhw>0.0</h2>
 <h2 id=TdhwSet>0.0</h2>
 </div>
 <div class=card id=boiler>
-<h1 id=boiler>Boiler</h1>
+<h1 id=boiler_h>Boiler</h1>
 
 <h2 id=Tboiler>0.0</h2>
 <h2 id=Tret>0.0</h2>
 
-<h2 id=mudulation_level>0.0</h2>
+<h2 id=modulation_level>0.0</h2>
+<h2 id=status>status</h2>
+
 </div>
 <div class=card id=ch>
-<h1 id=ch>CH</h1>
+<h1 id=CH_h>CH</h1>
 <h2 id=Tset>0.0</h2>
 
 <h2 id=ch_pres>0.0</h2>
