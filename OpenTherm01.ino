@@ -1,4 +1,4 @@
-#define _FW_VERSION "v1.0.0 (19-05-2020)"
+#define _FW_VERSION "v1.0.0 (11-06-2020)"
 
 #include <FS.h>
 #include <LittleFS.h>
@@ -9,10 +9,17 @@
 #include <opentherm.h>
 #include "timing.h"
 // Wemos D1 on 1of!-Wemos board
-#define THERMOSTAT_IN   16
-#define THERMOSTAT_OUT   4
-#define BOILER_IN        5
-#define BOILER_OUT      14
+#define THERMOSTAT_IN     16  //--- GPIO-16 / PIN-4  / D0
+#define THERMOSTAT_OUT     4  //--- GPIO-04 / PIN-5  / D2
+#define BOILER_IN          5  //--- GPIO-05 / PIN-6  / D1
+#define BOILER_OUT        14  //--- GPIO-14 / PIN-12 / D5
+
+#define KEEP_ALIVE_PIN    13  //--- GPIO-13 / PIN-14 / D7
+#define RED_LED1           2  //--- GPIO-02 / PIN-3  / D4
+#define RED_LED2           0  //--- GPIO-00 / PIN-4  / D3
+#define RED_LED3          12  //--- GPIO-12 / PIN-13 / D6
+
+#define FEEDTIME      2500
 
 #define MODE_LISTEN_MASTER  0
 #define MODE_LISTEN_SLAVE   1
@@ -24,6 +31,19 @@ int mode = 0;
 // WiFi Server object and parameters
 WiFiServer server(80);
 
+
+//=====================================================================
+void handleWDTfeed(bool force)
+{
+  if (force || (millis() > WDTfeedTimer))
+  {
+    WDTfeedTimer = millis() + FEEDTIME;
+    digitalWrite(KEEP_ALIVE_PIN, !digitalRead(KEEP_ALIVE_PIN));
+  }
+  
+} // handleWDTfeed();
+
+
 //=====================================================================
 void setup()
 {
@@ -31,6 +51,12 @@ void setup()
   while(!Serial) { /* wait a bit */ }
 
   lastReset     = ESP.getResetReason();
+
+  pinMode(LED_BUILTIN,    OUTPUT); // stupid! This is the same pin as RED_LED1 (only inversed)
+  pinMode(KEEP_ALIVE_PIN, OUTPUT);
+  pinMode(RED_LED1,       OUTPUT);
+  pinMode(RED_LED2,       OUTPUT);
+  pinMode(RED_LED3,       OUTPUT);
 
   startTelnet();
   
@@ -69,7 +95,15 @@ void setup()
   digitalWrite(LED_BUILTIN, LOW);
 
   startMDNS(settingHostname);
-  startNTP();
+
+  //--- ezTime initialisation
+  setDebug(INFO);  
+  waitForSync(); 
+  CET.setLocation(F("Europe/Amsterdam"));
+  CET.setDefault(); 
+  
+  Debugln("UTC time: "+ UTC.dateTime());
+  Debugln("CET time: "+ CET.dateTime());
 
   snprintf(cMsg, sizeof(cMsg), "Last reset reason: [%s]\r", ESP.getResetReason().c_str());
   DebugTln(cMsg);
@@ -121,9 +155,8 @@ void setup()
 //=====================================================================
 void loop()
 {
-  handleNTP();
-
-  
+  events(); // trigger ezTime update etc.
+  handleWDTfeed(false);
   httpServer.handleClient();
   MDNS.update();
 
@@ -132,5 +165,3 @@ void loop()
   myOpenthermLoop();
 
 } // loop()
-
-

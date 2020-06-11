@@ -281,6 +281,7 @@ bool freeSpace(uint16_t const& printsize)
 void updateFirmware()
 {
   DebugTln(F("Redirect to updateIndex .."));
+  handleWDTfeed(true);
   //noInterrupts(); //hjm
   doRedirect("wait ... ", 1, "/updateIndex", false);
       
