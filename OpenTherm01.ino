@@ -1,4 +1,4 @@
-#define _FW_VERSION "v1.0.0 (11-06-2020)"
+#define _FW_VERSION "v1.0.1 (14-06-2020)"
 
 #include <FS.h>
 #include <LittleFS.h>
@@ -15,9 +15,9 @@
 #define BOILER_OUT        14  //--- GPIO-14 / PIN-12 / D5
 
 #define KEEP_ALIVE_PIN    13  //--- GPIO-13 / PIN-14 / D7
-#define RED_LED1           2  //--- GPIO-02 / PIN-3  / D4
-#define RED_LED2           0  //--- GPIO-00 / PIN-4  / D3
-#define RED_LED3          12  //--- GPIO-12 / PIN-13 / D6
+#define LED_BLUE           2  //--- GPIO-02 / PIN-3  / D4
+#define LED_RED_B          0  //--- GPIO-00 / PIN-4  / D3
+#define LED_RED_C         12  //--- GPIO-12 / PIN-13 / D6
 
 #define FEEDTIME      2500
 
@@ -39,6 +39,7 @@ void handleWDTfeed(bool force)
   {
     WDTfeedTimer = millis() + FEEDTIME;
     digitalWrite(KEEP_ALIVE_PIN, !digitalRead(KEEP_ALIVE_PIN));
+    digitalWrite(LED_BLUE,        digitalRead(KEEP_ALIVE_PIN));
   }
   
 } // handleWDTfeed();
@@ -52,11 +53,11 @@ void setup()
 
   lastReset     = ESP.getResetReason();
 
-  pinMode(LED_BUILTIN,    OUTPUT); // stupid! This is the same pin as RED_LED1 (only inversed)
+  pinMode(LED_BUILTIN,    OUTPUT); // This is the same pin as LED_BLUE
   pinMode(KEEP_ALIVE_PIN, OUTPUT);
-  pinMode(RED_LED1,       OUTPUT);
-  pinMode(RED_LED2,       OUTPUT);
-  pinMode(RED_LED3,       OUTPUT);
+  pinMode(LED_BLUE,       OUTPUT);
+  pinMode(LED_RED_B,      OUTPUT);
+  pinMode(LED_RED_C,      OUTPUT);
 
   startTelnet();
   
@@ -84,6 +85,7 @@ void setup()
     Debug(".");
     t++;
   }
+  Debugln();
   if ( WiFi.status() != WL_CONNECTED) 
   {
     sprintf(cMsg, "Connect to AP '%s' and configure WiFi on  192.168.4.1   ", _HOSTNAME);
@@ -143,7 +145,12 @@ void setup()
   digitalWrite(BOILER_OUT, LOW);
   pinMode(BOILER_OUT, OUTPUT); // low output = high voltage, high output = low voltage
 
-  
+  for (int b=0; b<20; b++)
+  {
+    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+    delay(200);
+  }
+
 } // setup()
 
 /**

@@ -8,11 +8,14 @@
 **  TERMS OF USE: MIT License. See bottom of file.                                                            
 ***************************************************************************      
 */
+//--- Prototype
+void  handleWDTfeed(bool force);
 
 /*---- start macro's ------------------------------------------------------------------*/
 
 #define Debug(...)      ({ Serial.print(__VA_ARGS__);         \
                            TelnetStream.print(__VA_ARGS__);   \
+                           handleWDTfeed(true);               \
                         })
 #define Debugln(...)    ({ Serial.println(__VA_ARGS__);       \
                            TelnetStream.println(__VA_ARGS__); \
